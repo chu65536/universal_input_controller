@@ -22,8 +22,10 @@ export class InputController {
         if (!actionsToBind) return;
 
         for (const [action, params] of Object.entries(actionsToBind)) {
+            for (const keyCode of params.keys) {
+                this.#keyToActions.delete(keyCode);
+            }
             this.#bindedActions.set(action, params);
-
             for (const keyCode of params.keys) {
                 this.#keyToActions.set(keyCode, action);
             }
@@ -95,7 +97,12 @@ export class InputController {
     }
 
     #skipEvent(action) {
-        return !this.enabled || !action || !this.#isActionActivated(action);
+        return (
+            !this.enabled ||
+            !this.focused ||
+            !action ||
+            !this.#isActionActivated(action)
+        );
     }
 
     #addEventListeners() {
