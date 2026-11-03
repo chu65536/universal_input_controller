@@ -1,4 +1,6 @@
 import { InputController } from "./input-controller.js";
+import { KeyboardPlugin } from "./keyboard-plugin.js";
+import { MousePlugin } from "./mouse-plugin.js";
 
 main();
 
@@ -59,6 +61,16 @@ function main() {
     actionDeactivateButton.addEventListener("click", (event) => {
         controller.disableAction(actionInputField.value);
         console.log(`deactivcated ${actionInputField.value} action`);
+    });
+    const registerKeyboardPlugin = document.getElementById("keyboard");
+    registerKeyboardPlugin.addEventListener("click", (event) => {
+        controller.registerPlugins([new KeyboardPlugin("keyboard")]);
+        console.log(`registered keyboard plugin`);
+    });
+    const registerMousePlugin = document.getElementById("mouse");
+    registerKeyboardPlugin.addEventListener("click", (event) => {
+        controller.registerPlugins([new MousePlugin("mouse")]);
+        console.log(`registered mouse plugin`);
     });
 
     const square = {
