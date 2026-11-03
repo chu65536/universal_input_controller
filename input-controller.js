@@ -8,7 +8,7 @@ export class InputController {
     #bindedActions = new Map();
     #target;
     #keyToActions = new Map();
-    #activeActions = new Set();
+    #activeActions = new Map();
     #pressedKeys = new Set();
 
     #boundKeyDown = (event) => this.#onKeyDown(event);
@@ -73,18 +73,17 @@ export class InputController {
     #onKeyDown(key) {
         this.#pressedKeys.add(key.keyCode);
         const assignedAction = this.#keyToActions.get(key.keyCode);
-        if (
-            this.#skipEvent(assignedAction) ||
-            this.#activeActions.has(assignedAction)
-        ) {
-            return;
-        }
+        if (this.#skipEvent(assignedAction)) return;
 
-        this.#activeActions.add(assignedAction);
-        const eventToDispatch = new CustomEvent(this.ACTION_ACTIVATED, {
-            detail: { eventType: assignedAction },
-        });
-        this.#target.dispatchEvent(eventToDispatch);
+        if (this.#activeActions.has(assignedAction)) {
+            this.#activeActions.get(assignedAction).add(key.keyCode);
+        } else {
+            this.#activeActions.set(assignedAction, new Set([key.keyCode]));
+            const eventToDispatch = new CustomEvent(this.ACTION_ACTIVATED, {
+                detail: { eventType: assignedAction },
+            });
+            this.#target.dispatchEvent(eventToDispatch);
+        }
     }
 
     #onKeyUp(key) {
@@ -92,11 +91,14 @@ export class InputController {
         const assignedAction = this.#keyToActions.get(key.keyCode);
         if (this.#skipEvent(assignedAction)) return;
 
-        this.#activeActions.delete(assignedAction);
-        const eventToDispatch = new CustomEvent(this.ACTION_DEACTIVATED, {
-            detail: { eventType: assignedAction },
-        });
-        this.#target.dispatchEvent(eventToDispatch);
+        this.#activeActions.get(assignedAction).delete(key.keyCode);
+        if (this.#activeActions.get(assignedAction).size === 0) {
+            this.#activeActions.delete(assignedAction);
+            const eventToDispatch = new CustomEvent(this.ACTION_DEACTIVATED, {
+                detail: { eventType: assignedAction },
+            });
+            this.#target.dispatchEvent(eventToDispatch);
+        }
     }
 
     #focusOut(event) {
