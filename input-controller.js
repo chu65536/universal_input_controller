@@ -11,6 +11,9 @@ export class InputController {
     #activeActions = new Set();
     #pressedKeys = new Set();
 
+    #boundKeyDown = (event) => this.#onKeyDown(event);
+    #boundKeyUp = (event) => this.#onKeyUp(event);
+
     constructor(actionsToBind = null, target = null) {
         this.#target = target;
 
@@ -47,12 +50,14 @@ export class InputController {
     }
 
     attach(target, dontEnable = null) {
+        this.#removeEventListeners();
         this.#target = target;
         this.enabled = dontEnable ? false : true;
         this.#addEventListeners();
     }
 
     detach() {
+        this.#removeEventListeners();
         this.#target = null;
         this.enabled = false;
     }
@@ -121,11 +126,14 @@ export class InputController {
     #addEventListeners() {
         if (!this.#target) return;
 
-        this.#target.addEventListener("keydown", (event) =>
-            this.#onKeyDown(event),
-        );
-        this.#target.addEventListener("keyup", (event) => this.#onKeyUp(event));
-        this.#target.addEventListener("focus", (event) => this.#focusIn(event));
-        this.#target.addEventListener("blur", (event) => this.#focusOut(event));
+        this.#target.addEventListener("keydown", this.#boundKeyDown);
+        this.#target.addEventListener("keyup", this.#boundKeyUp);
+    }
+
+    #removeEventListeners() {
+        if (!this.#target) return;
+
+        this.#target.removeEventListener("keydown", this.#boundKeyDown);
+        this.#target.removeEventListener("keyup", this.#boundKeyUp);
     }
 }
