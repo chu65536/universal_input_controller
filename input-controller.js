@@ -49,6 +49,7 @@ export class InputController {
     attach(target, dontEnable = null) {
         this.#target = target;
         this.enabled = dontEnable ? false : true;
+        this.#addEventListeners();
     }
 
     detach() {
@@ -60,7 +61,9 @@ export class InputController {
         return this.#activeActions.has(action);
     }
 
-    isKeyPressed(keyCode) {}
+    isKeyPressed(keyCode) {
+        return this.#pressedKeys.has(keyCode);
+    }
 
     #onKeyDown(key) {
         this.#pressedKeys.add(key.keyCode);
@@ -91,6 +94,16 @@ export class InputController {
         this.#target.dispatchEvent(eventToDispatch);
     }
 
+    #focusOut(event) {
+        this.focused = false;
+        console.log("lost focus");
+    }
+
+    #focusIn(event) {
+        this.focused = true;
+        console.log("got focus");
+    }
+
     #isActionActivated(action) {
         const actionParams = this.#bindedActions.get(action);
         return actionParams.enabled == undefined || actionParams.enabled;
@@ -106,9 +119,13 @@ export class InputController {
     }
 
     #addEventListeners() {
+        if (!this.#target) return;
+
         this.#target.addEventListener("keydown", (event) =>
             this.#onKeyDown(event),
         );
         this.#target.addEventListener("keyup", (event) => this.#onKeyUp(event));
+        this.#target.addEventListener("focus", (event) => this.#focusIn(event));
+        this.#target.addEventListener("blur", (event) => this.#focusOut(event));
     }
 }

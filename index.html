@@ -3,12 +3,45 @@
     <head>
         <meta charset="UTF-8" />
         <title>Controller test</title>
+        <style>
+            button {
+                width: 500px;
+                height: 30px;
+                display: block;
+                margin: 0 auto;
+            }
+        </style>
     </head>
     <body>
         <script type="module" src="input-controller-test.js"></script>
 
-        <div id="test">
-            
+        <canvas
+            id="graphics"
+            style="display: block; background: #111; margin: 20px auto"
+            width="500"
+            height="500"
+        ></canvas>
+        <div>
+            <button id="attach">Attach controller</button>
+            <button id="detach">Detach controller</button>
+            <button id="activate">Activate controller</button>
+            <button id="deactivate">Deactivate controller</button>
+            <button id="space">Bind Jump</button>
+            <div
+                style="
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    width: 100%;
+                    max-width: 500px;
+                    margin: 0 auto;
+                "
+            >
+                <label>Action: </label>
+                <input type="text" id="action-input" />
+                <button id="activate-action">activate</button>
+                <button id="deactivate-action">deactivate</button>
+            </div>
         </div>
     </body>
 </html>
