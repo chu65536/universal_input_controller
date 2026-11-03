@@ -10,7 +10,10 @@ function main() {
         right: { keys: [39, 68] },
         up: { keys: [38, 87] },
         down: { keys: [40, 83] },
-        test: { keys: [13], enabled: false },
+
+        left_mouse_click: { keys: ["mouse-click0"] },
+        middle_mouse_click: { keys: ["mouse-click1"] },
+        right_mouse_click: { keys: ["mouse-click2"] },
     };
     const canvas = document.getElementById("graphics");
     const ctx = canvas.getContext("2d");
@@ -68,7 +71,7 @@ function main() {
         console.log(`registered keyboard plugin`);
     });
     const registerMousePlugin = document.getElementById("mouse");
-    registerKeyboardPlugin.addEventListener("click", (event) => {
+    registerMousePlugin.addEventListener("click", (event) => {
         controller.registerPlugins([new MousePlugin("mouse")]);
         console.log(`registered mouse plugin`);
     });
