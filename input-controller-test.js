@@ -88,55 +88,77 @@ function main() {
         console.log(`registered mouse plugin`);
     });
 
-    const square = {
-        x: canvas.width / 2 - 25,
-        y: canvas.height / 2 - 25,
-        size: 50,
-        speed: 500,
+    const ball = {
+        x: canvas.width / 2,
+        y: canvas.height - 30,
+        radius: 30,
         color: "red",
+        speed: 20,
+        jumping: false,
+        radiusScaleX: 1,
+        radiusScaleY: 1,
     };
+
+    gsap.ticker.add((time, deltaMs) => {
+        const dt = deltaMs / 1000;
+        let dx = 0;
+        if (controller.isActionActive("left")) dx = -ball.speed;
+        if (controller.isActionActive("right")) dx = ball.speed;
+        if (controller.isActionActive("jump")) jump();
+        ball.x += dx * Math.min(1, dt * 12);
+        ball.x = gsap.utils.clamp(
+            ball.radius,
+            canvas.width - ball.radius,
+            ball.x,
+        );
+        draw();
+    });
 
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = square.color;
-        ctx.fillRect(square.x, square.y, square.size, square.size);
+        ctx.beginPath();
+        ctx.ellipse(
+            ball.x,
+            ball.y,
+            ball.radius * ball.radiusScaleX,
+            ball.radius * ball.radiusScaleY,
+            0,
+            0,
+            Math.PI * 2,
+        );
+        ctx.fillStyle = ball.color;
+        ctx.fill();
     }
 
-    function update(dt) {
-        let dx = 0;
-        let dy = 0;
-
-        if (controller.isActionActive("left")) dx -= 1;
-        if (controller.isActionActive("right")) dx += 1;
-        if (controller.isActionActive("up")) dy -= 1;
-        if (controller.isActionActive("down")) dy += 1;
-
-        if (controller.isActionActive("jump")) square.color = "blue";
-        else square.color = "red";
-
-        if (dx !== 0 && dy !== 0) {
-            const inv = 1 / Math.sqrt(2);
-            dx *= inv;
-            dy *= inv;
-        }
-
-        square.x += dx * square.speed * dt;
-        square.y += dy * square.speed * dt;
-
-        square.x = Math.max(0, Math.min(canvas.width - square.size, square.x));
-        square.y = Math.max(0, Math.min(canvas.height - square.size, square.y));
+    function jump() {
+        if (ball.jumping) return;
+        ball.jumping = true;
+        gsap.timeline({ onComplete: () => (ball.jumping = false) })
+            .to(ball, {
+                y: canvas.height / 2,
+                duration: 0.5,
+                radiusScaleX: 0.8,
+                radiusScaleY: 1.1,
+                ease: "power2.out",
+            })
+            .to(ball, {
+                y: canvas.height - 30,
+                radiusScaleX: 1,
+                radiusScaleY: 1,
+                duration: 0.5,
+                ease: "power2.in",
+            })
+            .to(ball, {
+                radiusScaleX: 1.25,
+                radiusScaleY: 0.75,
+                duration: 0.07,
+                ease: "power1.out",
+            })
+            .to(ball, {
+                radiusScaleX: 1,
+                radiusScaleY: 1,
+                duration: 0.15,
+                ease: "elastic.out(1, 0.5)",
+            });
     }
-
-    let lastTime = performance.now();
-    function loop(now) {
-        const dt = Math.min((now - lastTime) / 1000, 0.05);
-        lastTime = now;
-
-        update(dt);
-        draw();
-
-        requestAnimationFrame(loop);
-    }
-
-    requestAnimationFrame(loop);
 }
