@@ -16,6 +16,9 @@ function main() {
         down: {
             input: [KeyboardPlugin.INPUT.S, KeyboardPlugin.INPUT.ARROW_DOWN],
         },
+
+        left_click: { input: [MousePlugin.INPUT.LEFT_CLICK] },
+        right_click: { input: [MousePlugin.INPUT.RIGHT_CLICK] },
     };
     const canvas = document.getElementById("graphics");
     const ctx = canvas.getContext("2d");

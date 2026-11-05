@@ -13,8 +13,8 @@ export class MousePlugin extends Plugin {
         2: this.INPUT.RIGHT_CLICK,
     };
 
-    #boundClick = (event) => this.#onClick(event);
-    #boundRelease = (event) => this.#onRelease(event);
+    #boundClick = this.#onClick.bind(this);
+    #boundRelease = this.#onRelease.bind(this);
 
     constructor(id) {
         super(id);

@@ -10,7 +10,7 @@ export class InputController {
     #activeActions = new Map();
     #plugins = new Map();
 
-    #boundPluginCallback = (params) => this.#pluginCallback(params);
+    #boundPluginCallback = this.#pluginCallback.bind(this);
 
     constructor(actionsToBind = null, target = null) {
         this.enabled = target ? true : false;

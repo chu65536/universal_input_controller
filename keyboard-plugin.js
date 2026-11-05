@@ -29,8 +29,8 @@ export class KeyboardPlugin extends Plugin {
         32: this.INPUT.SPACE,
     };
 
-    #boundKeyDown = (event) => this.#onKeyDown(event);
-    #boundKeyUp = (event) => this.#onKeyUp(event);
+    #boundKeyDown = this.#onKeyDown.bind(this);
+    #boundKeyUp = this.#onKeyUp.bind(this);
 
     constructor(id) {
         super(id);
