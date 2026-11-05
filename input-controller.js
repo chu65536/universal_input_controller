@@ -6,9 +6,8 @@ export class InputController {
 
     #target;
     #bindedActions = new Map();
-    #keyToActions = new Map();
+    #inputToActions = new Map();
     #activeActions = new Map();
-    #pressedKeys = new Set();
     #plugins = new Map();
 
     #boundPluginCallback = (params) => this.#pluginCallback(params);
@@ -27,14 +26,14 @@ export class InputController {
 
         for (const [action, params] of Object.entries(actionsToBind)) {
             if (this.#bindedActions.has(action)) {
-                for (const key in this.#bindedActions.get(action).keys) {
-                    this.#keyToActions.delete(key);
+                for (const i in this.#bindedActions.get(action).input) {
+                    this.#inputToActions.delete(i);
                 }
             }
 
             this.#bindedActions.set(action, params);
-            for (const key of params.keys) {
-                this.#keyToActions.set(key, action);
+            for (const i of params.input) {
+                this.#inputToActions.set(i, action);
             }
         }
     }
@@ -67,10 +66,6 @@ export class InputController {
         return this.#activeActions.has(action);
     }
 
-    isKeyPressed(keyCode) {
-        return this.#pressedKeys.has(keyCode);
-    }
-
     registerPlugins(plugins) {
         for (const plugin of plugins) {
             if (this.#plugins.has(plugin.id)) continue;
@@ -80,35 +75,29 @@ export class InputController {
     }
 
     #pluginCallback(params) {
-        switch (params.actionType) {
+        switch (params.inputType) {
             case Plugin.actionType.PRESS:
-                this.#pluginPressAction(params.actionData);
+                this.#pluginPressAction(params.inputData);
                 break;
             case Plugin.actionType.RELEASE:
-                this.#pluginReleaseAction(params.actionData);
+                this.#pluginReleaseAction(params.inputData);
                 break;
             default:
                 throw new Error(
-                    `unsupported plugin action type: ${params.actionType}`,
+                    `unsupported plugin input type: ${params.inputType}`,
                 );
                 break;
         }
     }
 
-    #pluginPressAction(pressActionData) {
-        this.#pressedKeys.add(pressActionData.keyCode);
-        const assignedAction = this.#keyToActions.get(pressActionData.keyCode);
+    #pluginPressAction(inputData) {
+        const assignedAction = this.#inputToActions.get(inputData);
         if (this.#skipEvent(assignedAction)) return;
 
         if (this.#activeActions.has(assignedAction)) {
-            this.#activeActions
-                .get(assignedAction)
-                .add(pressActionData.keyCode);
+            this.#activeActions.get(assignedAction).add(inputData);
         } else {
-            this.#activeActions.set(
-                assignedAction,
-                new Set([pressActionData.keyCode]),
-            );
+            this.#activeActions.set(assignedAction, new Set([inputData]));
             const eventToDispatch = new CustomEvent(this.ACTION_ACTIVATED, {
                 detail: { eventType: assignedAction },
             });
@@ -116,16 +105,11 @@ export class InputController {
         }
     }
 
-    #pluginReleaseAction(releaseActionData) {
-        this.#pressedKeys.delete(releaseActionData.keyCode);
-        const assignedAction = this.#keyToActions.get(
-            releaseActionData.keyCode,
-        );
+    #pluginReleaseAction(inputData) {
+        const assignedAction = this.#inputToActions.get(inputData);
         if (this.#skipEvent(assignedAction)) return;
 
-        this.#activeActions
-            .get(assignedAction)
-            .delete(releaseActionData.keyCode);
+        this.#activeActions.get(assignedAction).delete(inputData);
         if (this.#activeActions.get(assignedAction).size === 0) {
             this.#activeActions.delete(assignedAction);
             const eventToDispatch = new CustomEvent(this.ACTION_DEACTIVATED, {

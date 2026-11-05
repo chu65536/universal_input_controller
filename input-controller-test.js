@@ -6,14 +6,16 @@ main();
 
 function main() {
     const actions = {
-        left: { keys: [37, 65] },
-        right: { keys: [39, 68] },
-        up: { keys: [38, 87] },
-        down: { keys: [40, 83] },
-
-        left_mouse_click: { keys: ["mouse-click0"] },
-        middle_mouse_click: { keys: ["mouse-click1"] },
-        right_mouse_click: { keys: ["mouse-click2"] },
+        left: {
+            input: [KeyboardPlugin.INPUT.A, KeyboardPlugin.INPUT.ARROW_LEFT],
+        },
+        right: {
+            input: [KeyboardPlugin.INPUT.D, KeyboardPlugin.INPUT.ARROW_RIGHT],
+        },
+        up: { input: [KeyboardPlugin.INPUT.W, KeyboardPlugin.INPUT.ARROW_UP] },
+        down: {
+            input: [KeyboardPlugin.INPUT.S, KeyboardPlugin.INPUT.ARROW_DOWN],
+        },
     };
     const canvas = document.getElementById("graphics");
     const ctx = canvas.getContext("2d");
@@ -51,7 +53,14 @@ function main() {
     });
     const spaceButton = document.getElementById("space");
     spaceButton.addEventListener("click", (event) => {
-        controller.bindActions({ jump: { keys: [32], enabled: true } });
+        controller.bindActions({
+            jump: {
+                input: [
+                    KeyboardPlugin.INPUT.SPACE,
+                    MousePlugin.INPUT.MIDDLE_CLICK,
+                ],
+            },
+        });
         console.log("binded jump action");
     });
     const actionInputField = document.getElementById("action-input");
