@@ -105,6 +105,7 @@ function main() {
         if (controller.isActionActive("left")) dx = -ball.speed;
         if (controller.isActionActive("right")) dx = ball.speed;
         if (controller.isActionActive("jump")) jump();
+
         ball.x += dx * Math.min(1, dt * 12);
         ball.x = gsap.utils.clamp(
             ball.radius,
@@ -137,28 +138,57 @@ function main() {
             .to(ball, {
                 y: canvas.height / 2,
                 duration: 0.5,
-                radiusScaleX: 0.8,
-                radiusScaleY: 1.1,
                 ease: "power2.out",
             })
             .to(ball, {
-                y: canvas.height - 30,
-                radiusScaleX: 1,
-                radiusScaleY: 1,
+                y: canvas.height - ball.radius / 2,
                 duration: 0.5,
                 ease: "power2.in",
             })
             .to(ball, {
-                radiusScaleX: 1.25,
-                radiusScaleY: 0.75,
-                duration: 0.07,
+                radiusScaleX: 1.5,
+                radiusScaleY: 0.5,
+                duration: 0.1,
                 ease: "power1.out",
             })
             .to(ball, {
+                y: canvas.height - ball.radius,
                 radiusScaleX: 1,
                 radiusScaleY: 1,
-                duration: 0.15,
+                duration: 0.5,
                 ease: "elastic.out(1, 0.5)",
-            });
+            })
+            .to(
+                ball,
+                {
+                    keyframes: [
+                        {
+                            radiusScaleX: 0.5,
+                            radiusScaleY: 1.5,
+                            duration: 0.1,
+                            ease: "power2.out",
+                        },
+                        {
+                            radiusScaleX: 1,
+                            radiusScaleY: 1,
+                            duration: 0.4,
+                            ease: "power2.out",
+                        },
+                        {
+                            radiusScaleX: 0.5,
+                            radiusScaleY: 1.5,
+                            duration: 0.4,
+                            ease: "power2.in",
+                        },
+                        {
+                            radiusScaleX: 1,
+                            radiusScaleY: 1,
+                            duration: 0.1,
+                            ease: "power2.in",
+                        },
+                    ],
+                },
+                0,
+            );
     }
 }
